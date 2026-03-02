@@ -139,6 +139,28 @@ app.get('/verificar-vencimientos', async (req, res) => {
     .eq('estado', 'activo');
   res.json({ mensaje: 'Vencimientos verificados', data });
 });
+// Renovar cliente
+app.put('/clientes/:id/renovar', async (req, res) => {
+  const { id } = req.params;
+  const { estado, fecha_inicio, fecha_vencimiento, clases_restantes } = req.body;
+  const { data, error } = await supabase
+    .from('clientes')
+    .update({ estado, fecha_inicio, fecha_vencimiento, clases_restantes })
+    .eq('id', id)
+    .select();
+  if (error) return res.status(500).json({ error });
+  res.json(data[0]);
+});
 
+// Eliminar cliente
+app.delete('/clientes/:id', async (req, res) => {
+  const { id } = req.params;
+  const { error } = await supabase
+    .from('clientes')
+    .delete()
+    .eq('id', id);
+  if (error) return res.status(500).json({ error });
+  res.json({ ok: true });
+});
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`Servidor corriendo en puerto ${PORT}`));
